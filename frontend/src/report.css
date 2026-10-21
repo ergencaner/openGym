@@ -1,0 +1,56 @@
+/* The Report (views/Report.jsx) and the log-mode cards on Home. Built from the app's own tokens. */
+.rp .seg{margin-bottom:6px}
+.rp-nav{margin:8px 0 12px}
+.rp-nav .iconbtn{width:30px;height:30px;font-size:15px}
+.rp-nav .iconbtn:disabled{opacity:.3}
+
+.rp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.rp-tile{background:var(--surface);border-radius:var(--radius, 14px);padding:12px 13px;min-width:0}
+.rp-tile.tap{cursor:pointer}
+.rp-tile.tap:active{background:var(--surface-2)}
+.rp-tl{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--label-2)}
+.rp-tl span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rp-tl .rp-ed{font-size:11px;opacity:.5}
+.rp-tv{font-size:24px;font-weight:600;letter-spacing:-.024em;line-height:1.2;margin-top:4px}
+.rp-tv small,.rp-big small{font-size:13px;font-weight:500;color:var(--label-2);letter-spacing:0}
+.rp-ts{font-size:12px;color:var(--label-2);margin-top:3px;line-height:1.35}
+.rp-prog{height:5px;border-radius:3px;background:var(--surface-2);overflow:hidden;margin-top:7px}
+.rp-prog i{display:block;height:100%;background:var(--acc);border-radius:3px}
+.rp-note{margin:-4px 2px 12px}
+
+.rp-big{font-size:28px;font-weight:600;letter-spacing:-.026em;line-height:1.15;margin-top:6px}
+.rp-chg{display:inline-flex;align-items:center;gap:2px;font-size:13px;font-weight:600}
+.rp-chg svg{font-size:11px}
+.rp-sum{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;margin:4px 0 6px}
+
+.rp-dots{display:flex;gap:4px;flex:none}
+.rp-dots i{width:9px;height:9px;border-radius:50%;background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--sep)}
+.rp-dots i.on{background:var(--green);box-shadow:none}
+.rp-dots i.extra{background:var(--blue);box-shadow:none}
+
+.rp-bars{position:relative;display:grid;grid-template-columns:repeat(7,1fr);gap:6px;height:120px;margin-top:12px}
+.rp-bar{display:flex;flex-direction:column;align-items:center;min-width:0;cursor:pointer}
+.rp-bv{font-size:10px;color:var(--label-2);height:14px;white-space:nowrap}
+.rp-bc{flex:1;width:100%;max-width:26px;display:flex;align-items:flex-end;border-radius:5px;background:var(--surface-2);overflow:hidden}
+.rp-bc i{display:block;width:100%;background:var(--acc);border-radius:5px 5px 0 0;min-height:0}
+.rp-bl{font-size:11px;color:var(--label-2);margin-top:4px;height:14px}
+.rp-bar.today .rp-bl{color:var(--acc);font-weight:600}
+.rp-goal{position:absolute;inset-inline:0;border-top:1.5px dashed var(--yellow);opacity:.8;pointer-events:none;z-index:1}
+
+.rp-cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px;margin-top:4px}
+.rp-cmp>div{display:flex;flex-direction:column;gap:1px;min-width:0}
+.rp-cmp span{font-size:12px;color:var(--label-2)}
+.rp-cmp b{font-size:20px;font-weight:600;letter-spacing:-.02em}
+.rp-cmp em{font-style:normal;font-size:12px;color:var(--label-3, var(--label-2))}
+
+/* the week goal editor (activity-sheets.jsx) */
+.goal-row{display:flex;align-items:center;gap:10px;padding:4px 0}
+.goal-nm{flex:1;min-width:0;font-size:15px}
+.goal-row .stp{flex:none;width:168px}
+.goal-nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.goal-grp+.goal-grp{margin-top:4px}
+
+/* log-mode Home: the week's goals in one line each */
+.lm-goals{margin-top:6px}
+.lm-actions{display:flex;gap:8px;margin-top:12px}
+.lm-actions>.btn{flex:1}

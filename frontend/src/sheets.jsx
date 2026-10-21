@@ -2830,9 +2830,10 @@ function LogPastWorkout({ initial, close }) {
   const st = useStore(s => s.S)
   const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1)
   const planned = [].concat(initial?.routineIds || []).map(id => st.routines.find(r => r.id === id)).filter(Boolean)
+  // Log mode logs what you just did: today, started an hour ago (logWorkoutSheet).
   const [date, setDate] = useState(initial?.iso || isoOf(yesterday))
-  const [time, setTime] = useState('18:00')
-  const [dur, setDur] = useState(60)
+  const [time, setTime] = useState(initial?.time || '18:00')
+  const [dur, setDur] = useState(initial?.durationMin || 60)
   const [routineId, setRoutineId] = useState(planned.length > 1 ? PLANNED_DAY : planned[0]?.id || '')
   const today = todayISO()
   const options = [
@@ -2858,8 +2859,10 @@ function LogPastWorkout({ initial, close }) {
   }
 
   return <>
-    <h3>{t('Log a past workout')}</h3>
-    <div className="muted small" style={{ marginBottom: 12 }}>{t('Logged on the usual workout screen, without timers.')}</div>
+    <h3>{initial?.justDone ? t('Log a workout') : t('Log a past workout')}</h3>
+    <div className="muted small" style={{ marginBottom: 12 }}>{initial?.justDone
+      ? t('Pick the exercises you did and enter your sets. Duration is used for the calorie estimate.')
+      : t('Logged on the usual workout screen, without timers.')}</div>
     <Row icon="calendar" title={t('Date')}>
       <input type="date" className="timef" value={date} max={today} onChange={e => setDate(e.target.value)} /></Row>
     <Row icon="clock" title={t('Start time')}>
@@ -2898,6 +2901,16 @@ export function logPastWorkoutSheet(initial) {
   if (S().active) { toast(t('Finish the current workout first.')); return }
   const from = typeof initial?.iso === 'string' ? initial : null
   ui().openSheet(close => <LogPastWorkout initial={from} close={close} />)
+}
+// Log mode's way in (Settings → Log mode): a workout you have just finished, logged after the
+// fact on the backfill screen. Today, started an hour ago (or at midnight, just after it), freestyle.
+export function logWorkoutSheet() {
+  if (S().active) { navToWorkout(); return }
+  const now = new Date()
+  const from = new Date(Math.max(now.getTime() - 60 * 60000, new Date(isoOf(now) + 'T00:00:00').getTime()))
+  const pad = n => String(n).padStart(2, '0')
+  const durationMin = Math.max(1, Math.min(60, Math.floor((now - from) / 60000)))
+  ui().openSheet(close => <LogPastWorkout initial={{ iso: todayISO(), time: pad(from.getHours()) + ':' + pad(from.getMinutes()), durationMin, justDone: true }} close={close} />)
 }
 // A backfilled session is built the way a live one is (buildCombinedEntries → buildPlannedEntry),
 // so its entries carry the same stamps: the routine list, per-entry rid and the plan, no
