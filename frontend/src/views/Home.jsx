@@ -4,7 +4,7 @@ import { useStore } from '../store/useStore.js'
 import { effectiveRoutines, effectiveRoutineIds, nextTrainingDay, streakWeeks, lastBW, setsDoneActive } from '../lib/history.js'
 import { fmtNum, fmtDate, todayISO, isoOf, weekStartOf, weekDayOffset, DAYS, DAYN } from '../lib/format.js'
 import { t, tn, dateLocale } from '../lib/i18n.js'
-import { bwSheet, goalSheet, dayOverrideSheet, calendarSheet, startFlow, starterPlanSheet, bwDeltaColor, weighInsSheet } from '../sheets.jsx'
+import { bwSheet, goalSheet, dayOverrideSheet, calendarSheet, startFlow, starterPlanSheet, bwDeltaColor, weighInsSheet, logWorkoutSheet } from '../sheets.jsx'
 import LineChart from '../components/LineChart.jsx'
 import Icon from '../components/Icon.jsx'
 import QueueRow from '../components/QueueRow.jsx'
@@ -15,6 +15,66 @@ import { Button } from '../components/ui.jsx'
 import { tappable } from '../lib/use-sheet-keyboard.js'
 import { glyphOf } from '../lib/glyphs.js'
 import { dayNoteOf } from '../lib/day-notes.js'
+import { stepsSheet, weekGoalSheet } from '../activity-sheets.jsx'
+import { dayReport, weekReport } from '../lib/report.js'
+import { MUSCLE_NAME } from '../lib/muscles.js'
+import BodyMap from '../components/BodyMap.jsx'
+import '../report.css'
+
+// Log mode's Home (Settings → Log mode): today as logged so far, and the week against its goals.
+// Everything here is a door into the Report or a quick log; nothing asks for a plan.
+function LogModeCards({ S }) {
+  const nav = useNavigate()
+  const iso = todayISO()
+  const day = dayReport(S, iso)
+  const week = weekReport(S, iso, weekStartOf(S))
+  const g = week.goals
+  const goalRows = g.rows.filter(r => r.target > 0)
+  const fmtInt = n => Math.round(n || 0).toLocaleString(dateLocale())
+  return <>
+    <div className="card">
+      <div className="row between" style={{ marginBottom: 6 }}>
+        <h2 style={{ margin: 0 }}>{t('Today')}</h2>
+        <Button size="sm" variant="ghost" trailingIcon="chevronRight" onClick={() => nav(`/report?v=day&d=${iso}`)}>{t('Report')}</Button>
+      </div>
+      {day.workouts.length ? <div {...tappable(() => nav(`/report?v=day&d=${iso}`))}><BodyMap load={day.load} body={S.body} /></div>
+        : <div className="muted small">{t('Nothing logged today yet. Log the workout you did and the muscles show up here.')}</div>}
+      <div className="rp-grid" style={{ marginTop: 10, marginBottom: 0 }}>
+        <div className="rp-tile" style={{ background: 'var(--surface-2)' }}>
+          <div className="rp-tl"><Icon name="flame" style={{ color: 'var(--orange)' }} /><span>{t('Calories')}</span></div>
+          <div className="rp-tv">{fmtInt(day.kcal.total)}<small> kcal</small></div>
+        </div>
+        <div className="rp-tile tap" style={{ background: 'var(--surface-2)' }} {...tappable(() => stepsSheet(iso))}>
+          <div className="rp-tl"><Icon name="steps" style={{ color: 'var(--green)' }} /><span>{t('Steps')}</span><Icon name="pencil" className="rp-ed" /></div>
+          <div className="rp-tv">{day.steps ? fmtInt(day.steps) : '–'}</div>
+          {day.stepGoal > 0 && <div className="rp-prog"><i style={{ width: Math.min(1, (day.steps || 0) / day.stepGoal) * 100 + '%' }} /></div>}
+        </div>
+      </div>
+      <div className="lm-actions">
+        {S.active
+          ? <Button variant="primary" icon={S.active.editingWorkoutId ? 'pencil' : 'play'} onClick={() => nav('/workout')}>{S.active.editingWorkoutId ? t('Edit') : t('Resume')}</Button>
+          : <Button variant="primary" icon="plus" onClick={logWorkoutSheet}>{t('Log workout')}</Button>}
+        <Button icon="steps" onClick={() => stepsSheet(iso)}>{t('Log steps')}</Button>
+      </div>
+    </div>
+
+    <div className="card">
+      <div className="row between" style={{ marginBottom: 4 }}>
+        <h2 style={{ margin: 0 }}>{t('Weekly goals')}</h2>
+        <Button size="sm" icon={goalRows.length ? 'pencil' : 'target'} onClick={() => weekGoalSheet(week.from)}>{goalRows.length ? t('Edit') : t('Set goals')}</Button>
+      </div>
+      {goalRows.length ? <div className="lm-goals" {...tappable(() => nav('/report?v=week&d=' + iso))}>
+        {goalRows.map(r => <div key={r.muscle} className="mrow">
+          <span className="nm">{t(MUSCLE_NAME[r.muscle])}</span>
+          <span className="bar"><i style={{ width: Math.min(1, r.done / r.target) * 100 + '%', background: r.status === 'short' ? undefined : r.status === 'over' ? 'var(--blue)' : 'var(--green)' }} /></span>
+          <span className="v">{r.done}/{r.target} {t('days')}</span>
+        </div>)}
+        <div className="small muted" style={{ marginTop: 6 }}>{g.summary === 'short' ? t('{0} of {1} goals reached', g.met, g.total) : g.summary === 'over' ? t('All goals reached, some exceeded') : t('All goals reached')}
+          {' · '}{fmtInt(week.totals.kcal)} kcal · {fmtInt(week.totals.steps)} {t('steps')}</div>
+      </div> : <div className="muted small">{t('Set how many days each muscle should be trained this week, then follow it here.')}</div>}
+    </div>
+  </>
+}
 
 // Home = what to do now + a quick glance. Deep charts & history live in Stats.
 export default function Home() {
@@ -106,7 +166,7 @@ export default function Home() {
       <button className="iconbtn" onClick={() => nav('/settings')} aria-label={trouble ? t('Settings') + ', ' + t('Connection problem') : t('Settings')}><Icon name="gear" />{trouble && <span className="tab-dot" aria-hidden="true" />}</button>
     </div>
 
-    <div className="card">
+    {S.logMode === true ? <LogModeCards S={S} /> : <div className="card">
       {/* A coach week runs by order, not by weekday, so its progress row stands in for the
           seven dots (components/QueueRow.jsx). The today row below stays as it is: the queue's
           next session reaches it through effectiveRoutineIds like any planned routine. */}
@@ -156,7 +216,7 @@ export default function Home() {
           {t('Choose a different workout')}
         </Button>
       </div>}
-    </div>
+    </div>}
 
     {/* Jump to the gym check-in cards (QR membership codes). Shown here as a quick tap on
         arrival at the gym; folds away per user via the "Gym check-in" switch in Settings. */}
@@ -175,7 +235,7 @@ export default function Home() {
       </div>
     )}
 
-    {!S.routines.length && !S.active && (
+    {!S.routines.length && !S.active && S.logMode !== true && (
       <div className="card">
         <div className="row" style={{ gap: 10, marginBottom: 6 }}>
           <span className="lrow-i"><Icon name="calendar" /></span>

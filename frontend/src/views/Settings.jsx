@@ -36,6 +36,8 @@ import { forgetCoach } from '../lib/coach-api.js'
 import { REST_MAX, REST_PAUSE_MIN, REST_PAUSE_MAX, fmtRest, fmtDuration } from '../lib/duration.js'
 import { starterPlanSheet, confirmSheet, importFromApp, importFromHevy, equipmentProfileSheet, plateInventorySheet, dumbbellInventorySheet, menuSheet } from '../sheets.jsx'
 import Icon from '../components/Icon.jsx'
+import { stepGoalSheet } from '../activity-sheets.jsx'
+import { stepGoalOf } from '../lib/activity.js'
 import { durationSheet } from '../components/DurationWheel.jsx'
 import { showsConnection, showsLocalLine } from '../components/SyncBanner.jsx'
 import BackupFolderRow, { useBackupFolder, autoBackupSubtitle } from '../components/BackupFolderRow.jsx'
@@ -406,7 +408,7 @@ export default function Settings({ page = null, find = null, via = null }) {
     workout: () => (S.restSec > 0 ? t('{0} rest', fmtRest(S.restSec)) : t('No rest timer')) + ' · ' + layoutLabel,
     alerts: () => [S.sound ? t('Sound') : null, canVibrate && S.vibrate !== false ? t('Vibrate') : null, S.timerFlash ? t('Flash') : null].filter(Boolean).join(' · ') || t('Silent'),
     reminders: () => (S.reminder?.on ? (S.reminder.time || DEF.reminder?.time || '') : t('Off')),
-    plan: () => (mode === 'rotation' ? t('Rotation') : t('Fixed Week')) + ' · ' + shortWeekday(weekStartOf(S) === SUNDAY ? 0 : 1),
+    plan: () => (S.logMode === true ? t('Log mode') : mode === 'rotation' ? t('Rotation') : t('Fixed Week')) + ' · ' + shortWeekday(weekStartOf(S) === SUNDAY ? 0 : 1),
     units: () => (S.unit || 'kg') + ' · ' + (LANGS[lang] || lang),
     equipment: () => (S.equipFilterOn && activeProfile ? activeProfile.name : t('Everything')),
     look: () => themeLabel + ' · ' + accentLabel(S),
@@ -617,6 +619,16 @@ export default function Settings({ page = null, find = null, via = null }) {
     reminders: () => <NotificationsCard S={S} update={update} toast={toast} />,
 
     plan: () => <>
+      {/* Log mode: the app as a training log — log what you did, set weekly goals, read the report
+          (views/Report.jsx). The planner stays as it is underneath, routines included. */}
+      <Section footer={t('Log what you trained after the fact, set weekly muscle goals and follow them in the Report. Your routines stay saved.')}>
+        <Row icon="clipboard" iconTint="var(--indigo)" title={t('Log mode')}
+          subtitle={t('Use the app as a training log instead of a plan.')}>
+          <Switch checked={S.logMode === true} onChange={v => update(s => { s.logMode = v })} />
+        </Row>
+        <Row icon="steps" iconTint="var(--green)" title={t('Daily step goal')}
+          value={stepGoalOf(S) ? stepGoalOf(S).toLocaleString(dateLocale()) : t('Off')} accessory="chevron" onClick={stepGoalSheet} />
+      </Section>
       <Section>
         {/* Fixed Week (S.week) or Rotation (the live queue, lib/queue.js + lib/rotation.js).
             Derived from the queue, never stored. */}

@@ -237,6 +237,16 @@ export const DEF = {
   // cleared) replaces that role's curated exercise-id whitelist with a single user-chosen
   // exercise id; the stamp is what lets a sync keep the choice made last (lib/sync-merge.js).
   balanceTemplate: DEFAULT_TEMPLATE_ID, balanceOverrides: {},
+  // Log mode (Settings → Plan & schedule): the app as a training log rather than a planner. Home
+  // and the Start button offer to log what you did instead of a planned session, the Plan tab
+  // makes room for the Report (views/Report.jsx), and nothing asks for a routine. Off by default,
+  // so every profile keeps the planner it had; the routines stay saved either way.
+  logMode: false,
+  // A day's step count and a day's own calorie number, stamped per day (lib/activity.js), and a
+  // week's muscle goals, stamped per week (lib/week-goals.js). Merged per key (sync-merge.js).
+  steps: {}, dayKcal: {}, weekGoals: {},
+  // Daily step goal for the report; null or 0 = none.
+  stepGoal: 10000,
 }
 const clone = o => JSON.parse(JSON.stringify(o))
 

@@ -26,7 +26,7 @@ import WorkoutThumb, { hasWorkoutMedia } from '../components/WorkoutThumb.jsx'
 import { workoutSettingsSheet } from '../components/WorkoutSettingsSheet.jsx'
 import { durationSheet } from '../components/DurationWheel.jsx'
 import { REST_MAX, fmtRest } from '../lib/duration.js'
-import { startFlow, exercisePicker, exConfigSheet, exerciseDetailSheet, finishWorkout, exitWorkoutEdit, workoutCompleteSheet, confirmSheet, exerciseNoteSheet, sessionNoteSheet, renameWorkoutSheet, swapActiveWorkoutExercise, barWeightSheet, menuSheet, effortPickerSheet, exerciseHistorySheet, addRoutineToSessionSheet, finishWorkoutSheet } from '../sheets.jsx'
+import { startFlow, exercisePicker, exConfigSheet, exerciseDetailSheet, finishWorkout, exitWorkoutEdit, workoutCompleteSheet, confirmSheet, exerciseNoteSheet, sessionNoteSheet, renameWorkoutSheet, swapActiveWorkoutExercise, barWeightSheet, menuSheet, effortPickerSheet, exerciseHistorySheet, addRoutineToSessionSheet, finishWorkoutSheet, logWorkoutSheet, logPastWorkoutSheet } from '../sheets.jsx'
 import { afterScrollRestore, scrollRestorePending } from '../components/Modals.jsx'
 import { effortColor } from '../lib/effort.js'
 import Elapsed from '../components/Elapsed.jsx'
@@ -52,10 +52,26 @@ import { withMeaning, historyAs, dbLoadFor, entryDbLoad, bellsIn, ownedWeightsFo
 // and the second logged it at one second.
 const HOLD_KEY_GRACE_MS = 1500
 
+/* ---------- log mode: what to log (Settings → Log mode) ---------- */
+// The planner's chooser asks which routine to start; a log asks what you did. The workout you
+// just finished is the first door, a day before today the second, and a session you track live
+// as you go (the freestyle one, timers and all) stays one tap away.
+function LogChooser() {
+  return <div className="narrow">
+    <div className="hdr"><div><h1>{t('Log workout')}</h1><div className="sub">{t('Pick the exercises you did and enter your sets.')}</div></div></div>
+    <Button variant="primary" icon="checkCircle" onClick={logWorkoutSheet}>{t('Log a workout I just did')}</Button>
+    <div style={{ height: 10 }} />
+    <Button icon="calendar" onClick={() => logPastWorkoutSheet()}>{t('Log a past workout')}</Button>
+    <div style={{ height: 10 }} />
+    <Button icon="shuffle" onClick={() => startFlow([])}>{t('Track live as I train')}</Button>
+  </div>
+}
+
 /* ---------- start chooser (no active workout) ---------- */
 function StartChooser() {
   const nav = useNavigate()
   const S = useStore(s => s.S)
+  if (S.logMode === true) return <LogChooser />
   const todayIds = effectiveRoutineIds(S, todayISO())
   const todayRoutines = effectiveRoutines(S, todayISO())
   const todayName = todayRoutines.map(r => r.name).join(' + ')
