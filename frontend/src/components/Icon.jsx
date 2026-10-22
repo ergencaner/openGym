@@ -158,6 +158,9 @@ const P = {
   chartLineSlash: <><path d="M3.6 20.2V4.4M3.6 20.2h16.8M6.4 16.4l3.9-4.8 3.1 2.7 5.2-6.6" /><path d="M4.6 4.6 19.8 19.8" /></>,
   // warm-up (flame is the streak only)
   sunrise: <path d="M3.6 17.4h16.8M7.6 17.4a4.4 4.4 0 0 1 8.8 0M12 6.4v2.4M5.4 10.2 7 11.8M18.6 10.2 17 11.8M8.4 20.4h7.2" />,
+  // Nutrition (views/Nutrition.jsx): a capsule for supplements, a fork and knife for meals.
+  pill: <><rect x="3.4" y="8.7" width="17.2" height="6.6" rx="3.3" transform="rotate(-45 12 12)" /><path d="M9.6 9.6l4.8 4.8" /></>,
+  utensils: <path d="M7 3v7.5M4.8 3v4.8a2.2 2.2 0 0 0 4.4 0V3M7 10.5V21M16.6 21V3c-2.2 1.4-3.3 4-3.3 7.2V13h3.3" />,
   plusCircle: <><circle cx="12" cy="12" r="8.2" /><path d="M12 8.2v7.6M8.2 12h7.6" /></>,
   // a timed set's clock (timer stays the rest timer)
   stopwatch: <><circle cx="12" cy="13.4" r="7.2" /><path d="M12 9.6v3.8M9.6 3.4h4.8M18 7.2l1.4-1.4" /></>,

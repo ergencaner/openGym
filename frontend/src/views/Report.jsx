@@ -13,6 +13,9 @@ import { logWorkoutSheet, logPastWorkoutSheet, workoutDetailSheet } from '../she
 import { stepsSheet, kcalSheet, weekGoalSheet, stepGoalSheet } from '../activity-sheets.jsx'
 import BodyMap, { BodyMapLegend } from '../components/BodyMap.jsx'
 import Icon from '../components/Icon.jsx'
+import WeekBars from '../components/WeekBars.jsx'
+import { NutritionBars } from './Nutrition.jsx'
+import { dayIntake, goalOf, showsNutrition } from '../lib/nutrition.js'
 import { Button, Segmented } from '../components/ui.jsx'
 import { tappable } from '../lib/use-sheet-keyboard.js'
 import '../report.css'
@@ -43,29 +46,25 @@ function Tile({ icon, tint, label, value, unit, sub, onClick, children }) {
   </div>
 }
 
-/** Seven bars, one per day, with an optional goal line; a day with no value has no bar. */
-function WeekBars({ days, values, goal, onDay, label }) {
-  const max = Math.max(goal || 0, ...values, 1)
-  const today = todayISO()
-  return <div className="rp-bars" role="img" aria-label={label}>
-    {goal > 0 && <div className="rp-goal" style={{ bottom: 18 + goal / max * 88 }} />}
-    {days.map((d, i) => {
-      const v = values[i] || 0
-      const hit = goal > 0 && v >= goal
-      return <div key={d} className={'rp-bar' + (d === today ? ' today' : '')} {...(onDay ? tappable(() => onDay(d)) : {})}>
-        <div className="rp-bv">{v ? (v >= 10000 ? Math.round(v / 1000) + 'k' : fmtInt(v)) : ''}</div>
-        <div className="rp-bc"><i style={{ height: (v / max * 100) + '%', background: hit ? 'var(--green)' : undefined }} /></div>
-        <div className="rp-bl">{t(DAYS[new Date(d + 'T12:00:00').getDay()])}</div>
-      </div>
-    })}
-  </div>
-}
-
 /** The muscles a load reached, hardest first, as chips. */
 function MuscleChips({ load }) {
   const { worked } = rankOf(load)
   if (!worked.length) return null
   return <div className="mchips" style={{ marginTop: 8 }}>{worked.map(m => <span key={m} className="mchip">{t(MUSCLE_NAME[m])}</span>)}</div>
+}
+
+/** What the day's meals added up to against the goal, next to what it burned. */
+function NutritionDay({ S, iso, burned }) {
+  const nav = useNavigate()
+  const intake = dayIntake(S, iso)
+  return <div className="card tappable" {...tappable(() => nav(`/nutrition?v=day&d=${iso}`))}>
+    <div className="row between" style={{ marginBottom: 8 }}>
+      <h2 style={{ margin: 0 }}>{t('Nutrition')}</h2>
+      <Icon name="chevronRight" className="chev" />
+    </div>
+    <NutritionBars intake={intake} goal={goalOf(S)} compact />
+    <div className="muted small" style={{ marginTop: 10 }}>{t('Eaten {0} kcal · burned {1} kcal', fmtInt(intake.kcal), fmtInt(burned))}</div>
+  </div>
 }
 
 /* ------------------------------ one day ------------------------------ */
@@ -103,6 +102,7 @@ function DayView({ S, iso }) {
       <Tile icon="clock" tint="var(--purple)" label={t('Training time')} value={k.minutes ? fmtInt(k.minutes) : '–'} unit={k.minutes ? t('min') : null}
         sub={r.prs ? t('Records') + ' ' + r.prs : null} />
     </div>
+    {showsNutrition(S) && <NutritionDay S={S} iso={iso} burned={k.total} />}
     {k.assumedKg && <div className="muted small rp-note">{t('No body weight logged yet, so calories assume 75 kg. Log your weight for a better estimate.')}</div>}
 
     {r.workouts.length > 0 && <>

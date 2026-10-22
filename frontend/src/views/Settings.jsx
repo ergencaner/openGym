@@ -38,6 +38,8 @@ import { starterPlanSheet, confirmSheet, importFromApp, importFromHevy, equipmen
 import Icon from '../components/Icon.jsx'
 import { stepGoalSheet } from '../activity-sheets.jsx'
 import { stepGoalOf } from '../lib/activity.js'
+import { nutritionGoalSheet, foodsSheet, suppsSheet } from '../nutrition-sheets.jsx'
+import { showsNutrition, goalOf as nutriGoalOf, foodsOf, suppsOf } from '../lib/nutrition.js'
 import { durationSheet } from '../components/DurationWheel.jsx'
 import { showsConnection, showsLocalLine } from '../components/SyncBanner.jsx'
 import BackupFolderRow, { useBackupFolder, autoBackupSubtitle } from '../components/BackupFolderRow.jsx'
@@ -628,6 +630,18 @@ export default function Settings({ page = null, find = null, via = null }) {
         </Row>
         <Row icon="steps" iconTint="var(--green)" title={t('Daily step goal')}
           value={stepGoalOf(S) ? stepGoalOf(S).toLocaleString(dateLocale()) : t('Off')} accessory="chevron" onClick={stepGoalSheet} />
+      </Section>
+      {/* Nutrition (views/Nutrition.jsx): meals against a daily goal, saved foods, supplements. */}
+      <Section title={t('Nutrition')}>
+        <Row icon="utensils" iconTint="var(--orange)" title={t('Nutrition on Home')}
+          subtitle={t('Show today’s meals and supplements on Home.')}>
+          <Switch checked={showsNutrition(S)} onChange={v => update(s => { s.showNutrition = v })} />
+        </Row>
+        <Row icon="target" iconTint="var(--orange)" title={t('Daily nutrition goal')} accessory="chevron" onClick={nutritionGoalSheet}
+          value={nutriGoalOf(S).kcal ? nutriGoalOf(S).kcal.toLocaleString(dateLocale()) + ' kcal' : t('Off')} />
+        <Row icon="list" iconTint="var(--orange)" title={t('Saved foods')} value={String(foodsOf(S).length)} accessory="chevron" onClick={foodsSheet} />
+        <Row icon="pill" iconTint="var(--teal)" title={t('Supplements')} value={String(suppsOf(S).length)} accessory="chevron" onClick={suppsSheet} />
+        <Row icon="chartLine" iconTint="var(--orange)" title={t('Open nutrition')} accessory="chevron" onClick={() => nav('/nutrition')} />
       </Section>
       <Section>
         {/* Fixed Week (S.week) or Rotation (the live queue, lib/queue.js + lib/rotation.js).
