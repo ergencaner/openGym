@@ -19,6 +19,29 @@ import { stepsSheet, weekGoalSheet } from '../activity-sheets.jsx'
 import { dayReport, weekReport } from '../lib/report.js'
 import { MUSCLE_NAME } from '../lib/muscles.js'
 import BodyMap from '../components/BodyMap.jsx'
+import { NutritionBars } from './Nutrition.jsx'
+import { mealSheet } from '../nutrition-sheets.jsx'
+import { dayIntake, goalOf, suppsOn, showsNutrition } from '../lib/nutrition.js'
+
+
+// Today's meals against the daily goal, and the supplements ticked off.
+function NutritionCard({ S }) {
+  const nav = useNavigate()
+  const iso = todayISO()
+  const supps = suppsOn(S, iso)
+  const taken = supps.filter(s => s.n > 0).length
+  return <div className="card">
+    <div className="row between" style={{ marginBottom: 8 }}>
+      <h2 style={{ margin: 0 }}>{t('Nutrition')}</h2>
+      <Button size="sm" variant="ghost" trailingIcon="chevronRight" onClick={() => nav('/nutrition')}>{t('Details')}</Button>
+    </div>
+    <div {...tappable(() => nav('/nutrition'))}><NutritionBars intake={dayIntake(S, iso)} goal={goalOf(S)} compact /></div>
+    <div className="lm-actions">
+      <Button variant="tinted" icon="utensils" onClick={() => mealSheet(iso)}>{t('Add meal')}</Button>
+      <Button icon="pill" onClick={() => nav('/nutrition')}>{supps.length ? t('Supplements') + ' ' + taken + '/' + supps.length : t('Supplements')}</Button>
+    </div>
+  </div>
+}
 import '../report.css'
 
 // Log mode's Home (Settings → Log mode): today as logged so far, and the week against its goals.
@@ -217,6 +240,8 @@ export default function Home() {
         </Button>
       </div>}
     </div>}
+
+    {showsNutrition(S) && <NutritionCard S={S} />}
 
     {/* Jump to the gym check-in cards (QR membership codes). Shown here as a quick tap on
         arrival at the gym; folds away per user via the "Gym check-in" switch in Settings. */}

@@ -87,6 +87,10 @@ export const SEARCH = [
   // Plan & schedule
   { page: 'plan', title: 'Log mode', icon: 'clipboard', tint: 'var(--indigo)', kw: 'log journal tracker diary after no plan freestyle report goals' },
   { page: 'plan', title: 'Daily step goal', icon: 'steps', tint: 'var(--green)', kw: 'steps walking pedometer goal target' },
+  { page: 'plan', title: 'Nutrition on Home', icon: 'utensils', tint: 'var(--orange)', kw: 'nutrition food meals diet calories protein fat home card' },
+  { page: 'plan', title: 'Daily nutrition goal', icon: 'target', tint: 'var(--orange)', kw: 'nutrition calories protein saturated fat goal target diet macros' },
+  { page: 'plan', title: 'Saved foods', icon: 'list', tint: 'var(--orange)', kw: 'food foods meal preset template grams nutrition' },
+  { page: 'plan', title: 'Supplements', icon: 'pill', tint: 'var(--teal)', kw: 'supplement vitamin creatine fish oil magnesium protein powder multivitamin' },
   { page: 'plan', title: 'How you train', icon: 'repeat', tint: 'var(--orange)', kw: 'scheduling schedule rotation fixed week split loop round cycle', opts: ['Fixed Week', 'Rotation'] },
   { page: 'plan', title: 'Week starts on', icon: 'calendar', tint: 'var(--orange)', kw: 'monday sunday first day week', opts: ['Monday', 'Sunday'], tkw: () => t('week start') },
   { page: 'plan', title: 'Load starter plan', icon: 'clipboard', tint: 'var(--green)', kw: 'starter template beginner program routine' },

@@ -247,6 +247,12 @@ export const DEF = {
   steps: {}, dayKcal: {}, weekGoals: {},
   // Daily step goal for the report; null or 0 = none.
   stepGoal: 10000,
+  // Nutrition (lib/nutrition.js): meals, saved foods, supplements and what was taken each day, each
+  // entry stamped and merged per key; the daily goal for calories, protein and saturated fat.
+  meals: {}, foods: {}, supps: {}, suppLog: {},
+  nutriGoal: { kcal: null, p: null, sf: null },
+  // The nutrition card on Home: null follows log mode, true/false is your own choice.
+  showNutrition: null,
 }
 const clone = o => JSON.parse(JSON.stringify(o))
 

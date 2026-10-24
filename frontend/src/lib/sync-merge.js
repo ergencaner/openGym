@@ -83,8 +83,9 @@ const clone = o => JSON.parse(JSON.stringify(o))
 const list = v => (Array.isArray(v) ? v : [])
 // The maps whose every entry carries its own edit time (mergeStampedMap). dayNotes is a day's
 // note on a day off (lib/day-notes.js), one entry per date; steps and dayKcal a day's step count
-// and own calorie number (lib/activity.js); weekGoals a week's muscle goals (lib/week-goals.js).
-export const STAMPED_MAPS = ['balanceOverrides', 'loadKind', 'plates', 'dbLoad', 'dumbbells', 'dayNotes', 'steps', 'dayKcal', 'weekGoals']
+// and own calorie number (lib/activity.js); weekGoals a week's muscle goals (lib/week-goals.js);
+// meals, foods, supps and suppLog what you ate and took, one entry each (lib/nutrition.js).
+export const STAMPED_MAPS = ['balanceOverrides', 'loadKind', 'plates', 'dbLoad', 'dumbbells', 'dayNotes', 'steps', 'dayKcal', 'weekGoals', 'meals', 'foods', 'supps', 'suppLog']
 
 /** The copy with the later `_ts`; on a tie the first argument (callers pass local first). */
 export const newerOf = (a, b) => ((b?._ts || 0) > (a?._ts || 0) ? b : a)
@@ -614,7 +615,7 @@ const OWN_MERGE = new Set([
   '_ts', '_rev', '_wid', '_wids', '_unstamped', '_prior', 'active', 'unit', 'unitSet', 'resetAt', 'resetIds', 'deleted', 'edited', 'undone', 'routineOrder',
   'workouts', 'routines', 'customEx', 'equipProfiles', 'gymCards', 'bodyweight', 'measurements', 'favEx',
   'exWeights', 'balanceOverrides', 'loadKind', 'plates', 'dbLoad', 'dumbbells', 'dayNotes',
-  'steps', 'dayKcal', 'weekGoals',
+  'steps', 'dayKcal', 'weekGoals', 'meals', 'foods', 'supps', 'suppLog',
 ])
 // Stamped per key instead of whole: one day of the plan, one exercise's note or bar.
 const PER_KEY = new Set(['week', 'dayPlan', 'exNotes', 'barWeights'])
